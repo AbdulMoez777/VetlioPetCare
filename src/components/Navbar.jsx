@@ -3,7 +3,7 @@ import React from "react";
 function Navbar() {
   return (
     <>
-      <nav className="flex justify-between items-center h-[110px] px-10 bg-[#f6efe4]">
+      <nav className="flex justify-between items-center h-[110px] px-30 bg-[#f6efe4]">
         <div className="w-36 h-15 flex justify-center items-center bg-white rounded-xl ">
           <img
             className="object-cover"
