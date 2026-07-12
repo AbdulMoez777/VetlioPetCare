@@ -7,7 +7,7 @@ function Navbar() {
         <div className="w-36 h-15 flex justify-center items-center bg-white rounded-xl ">
           <img
             className="object-cover"
-            src="\public\VetlioLogo.png"
+            src="/VetlioLogo.png"
             alt="logo"
           />
         </div>
