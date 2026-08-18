@@ -1,5 +1,4 @@
 import React from "react";
-import { FileText, Users, Award } from "lucide-react";
 
 function HowItWorks() {
   return (
