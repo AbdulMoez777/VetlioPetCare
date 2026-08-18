@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Phone,
   Mail,
-  MapPin,
   Calendar,
   Clock,
+  ArrowRight,
+  CheckCircle2
 } from "lucide-react";
+import { useBooking } from "../context/BookingContext";
 
 // Clean brand SVG icons
 const FacebookIcon = () => (
@@ -28,30 +31,26 @@ const TwitterIcon = () => (
   </svg>
 );
 
-const YoutubeIcon = () => (
-  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-  </svg>
-);
+function Footer() {
+  const { openBooking, showToast } = useBooking();
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
-function Footer({ onOpenBooking }) {
-  const handleLinkClick = (e, href) => {
+  const handleNewsletterSubmit = (e) => {
     e.preventDefault();
-    const targetElement = document.querySelector(href);
-    if (targetElement) {
-      targetElement.scrollIntoView({ behavior: "smooth" });
+    if (newsletterEmail && newsletterEmail.includes("@")) {
+      setIsSubscribed(true);
+      showToast("Thank you for subscribing to Vetlio Pet Health tips!", "success");
+      setNewsletterEmail("");
     }
   };
 
   return (
     <>
-      <footer
-        id="contact"
-        className="bg-[#f6efe4] flex flex-col items-center justify-center pt-8 sm:pt-16"
-      >
+      <footer className="bg-[#f6efe4] flex flex-col items-center justify-center pt-8 sm:pt-16">
         {/* Schedule Appointment Banner */}
-        <div className="w-full max-w-5xl px-4 sm:px-6 mb-16 md:mb-24">
-          <div className="bg-[#27221F] flex flex-col md:flex-row items-center justify-between rounded-3xl p-6 sm:p-10 md:p-12 gap-8 shadow-xl">
+        <div className="w-full max-w-5xl px-4 sm:px-6 mb-14 md:mb-20">
+          <div className="bg-[#27221F] flex flex-col md:flex-row items-center justify-between rounded-3xl p-6 sm:p-10 md:p-12 gap-8 shadow-xl border border-stone-800">
             <div className="w-full md:w-1/2 flex flex-col items-start justify-center text-left">
               <span className="text-xs font-bold text-[#A0DF6D] uppercase tracking-widest bg-white/10 px-3.5 py-1 rounded-full mb-3">
                 Ready to get started?
@@ -62,15 +61,23 @@ function Footer({ onOpenBooking }) {
               <p className="text-stone-300 text-sm mt-3 font-medium">
                 Give your furry companion the personalized attention and veterinary excellence they deserve.
               </p>
-              <button
-                onClick={onOpenBooking}
-                className="bg-[#6E9B49] hover:bg-[#5b8c3d] text-white font-bold text-xs uppercase tracking-wider px-8 py-3.5 mt-6 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-2"
-              >
-                <Calendar className="w-4 h-4" /> Book Now
-              </button>
+              <div className="flex flex-wrap items-center gap-4 mt-6">
+                <button
+                  onClick={() => openBooking()}
+                  className="bg-[#6E9B49] hover:bg-[#5b8c3d] text-white font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" /> Book Now
+                </button>
+                <Link
+                  to="/services"
+                  className="text-stone-200 hover:text-white text-xs font-bold uppercase tracking-wider underline underline-offset-4 transition-colors"
+                >
+                  Explore All Services &rarr;
+                </Link>
+              </div>
             </div>
 
-            <div className="w-full md:w-1/2 h-48 sm:h-64 md:h-72 overflow-hidden rounded-2xl">
+            <div className="w-full md:w-1/2 h-52 sm:h-64 md:h-72 overflow-hidden rounded-2xl">
               <img
                 src="/AppointmentImage.png"
                 alt="Vet examining pet with care"
@@ -81,151 +88,165 @@ function Footer({ onOpenBooking }) {
         </div>
 
         {/* Main Footer Green Section */}
-        <div className="bg-[#6E9B49] w-full rounded-t-[32px] sm:rounded-t-[48px] pt-14 md:pt-20 pb-10 px-6 sm:px-12 md:px-20 flex flex-col items-center">
-          <div className="flex flex-col md:flex-row justify-between w-full max-w-5xl gap-10 md:gap-16">
+        <div className="bg-[#6E9B49] w-full rounded-t-[32px] sm:rounded-t-[48px] pt-14 md:pt-20 pb-10 px-6 sm:px-12 md:px-20 flex flex-col items-center text-white">
+          <div className="flex flex-col md:flex-row justify-between w-full max-w-6xl gap-10 md:gap-14">
             {/* Left Brand Area */}
-            <div className="w-full md:w-5/12">
-              <h1 className="text-white font-extrabold text-5xl sm:text-6xl md:text-7xl lg:text-[80px] uppercase tracking-tighter leading-none mb-4">
-                VETLIO
-              </h1>
+            <div className="w-full md:w-4/12">
+              <Link to="/" className="inline-block">
+                <h1 className="text-white font-extrabold text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tighter leading-none mb-3">
+                  VETLIO
+                </h1>
+              </Link>
               <p className="text-white/85 text-sm sm:text-base leading-relaxed max-w-sm">
-                Gentle, modern, and compassionate veterinary healthcare for dogs, cats, and all cherished pets.
+                Gentle, modern, and compassionate veterinary healthcare for dogs, cats, and all cherished companion animals.
               </p>
-              <div className="mt-6 flex items-center gap-2 text-white/90 text-xs font-semibold bg-white/10 px-3.5 py-2 rounded-xl w-fit">
+              <div className="mt-6 flex items-center gap-2 text-white/95 text-xs font-semibold bg-black/15 px-3.5 py-2.5 rounded-xl w-fit backdrop-blur-xs">
                 <Clock className="w-4 h-4 text-[#f6efe4]" />
                 Mon - Sat: 8:00 AM - 8:00 PM • Sun: Emergencies
               </div>
             </div>
 
-            {/* Right Links & Contact Area */}
-            <div className="w-full md:w-7/12 grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
-              {/* Quick Navigation Menu */}
-              <div>
-                <h4 className="text-white font-extrabold text-lg sm:text-xl mb-4 sm:mb-6 uppercase tracking-tight">
-                  Menu
-                </h4>
-                <ul className="text-white space-y-3 text-sm font-medium">
-                  <li>
-                    <a
-                      href="#about"
-                      onClick={(e) => handleLinkClick(e, "#about")}
-                      className="hover:text-[#f6efe4] hover:underline underline-offset-4 cursor-pointer transition-colors block"
-                    >
-                      ABOUT US
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#services"
-                      onClick={(e) => handleLinkClick(e, "#services")}
-                      className="hover:text-[#f6efe4] hover:underline underline-offset-4 cursor-pointer transition-colors block"
-                    >
-                      SERVICES
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#how-it-works"
-                      onClick={(e) => handleLinkClick(e, "#how-it-works")}
-                      className="hover:text-[#f6efe4] hover:underline underline-offset-4 cursor-pointer transition-colors block"
-                    >
-                      HOW IT WORKS
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#values"
-                      onClick={(e) => handleLinkClick(e, "#values")}
-                      className="hover:text-[#f6efe4] hover:underline underline-offset-4 cursor-pointer transition-colors block"
-                    >
-                      OUR VALUES
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#contact"
-                      onClick={(e) => handleLinkClick(e, "#contact")}
-                      className="hover:text-[#f6efe4] hover:underline underline-offset-4 cursor-pointer transition-colors block"
-                    >
-                      CONTACT
-                    </a>
-                  </li>
-                </ul>
-              </div>
+            {/* Middle Quick Links */}
+            <div className="w-full md:w-2/12">
+              <h4 className="font-extrabold text-sm uppercase tracking-wider text-stone-100 mb-4 pb-1 border-b border-white/20">
+                Navigation
+              </h4>
+              <ul className="space-y-2.5 text-xs sm:text-sm font-medium text-white/85">
+                <li>
+                  <Link to="/" className="hover:text-white hover:underline transition-all">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" className="hover:text-white hover:underline transition-all">
+                    About Our Clinic
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services" className="hover:text-white hover:underline transition-all">
+                    All Services
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/how-it-works" className="hover:text-white hover:underline transition-all">
+                    How It Works
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/my-appointments" className="hover:text-white hover:underline transition-all">
+                    My Appointments
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="hover:text-white hover:underline transition-all">
+                    Contact & Emergency
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-              {/* Contact Info Column */}
-              <div>
-                <h4 className="text-white font-extrabold text-lg sm:text-xl mb-4 sm:mb-6 uppercase tracking-tight">
-                  Contact Info
-                </h4>
-                <ul className="text-white space-y-3.5 text-sm font-medium">
-                  <li className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                      <Phone className="w-4 h-4" />
-                    </div>
-                    <span>648-423-2785</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                      <Mail className="w-4 h-4" />
-                    </div>
-                    <span className="uppercase">CONTACT@VETLIO.COM</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <MapPin className="w-4 h-4" />
-                    </div>
-                    <span>
-                      Lahore, Punjab, Pakistan
-                    </span>
-                  </li>
-                </ul>
+            {/* Services Links */}
+            <div className="w-full md:w-3/12">
+              <h4 className="font-extrabold text-sm uppercase tracking-wider text-stone-100 mb-4 pb-1 border-b border-white/20">
+                Featured Care
+              </h4>
+              <ul className="space-y-2.5 text-xs sm:text-sm font-medium text-white/85">
+                <li>
+                  <Link to="/services/checkup" className="hover:text-white hover:underline transition-all">
+                    General Health Checkup
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services/walking" className="hover:text-white hover:underline transition-all">
+                    Dog Walking & Activity
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services/grooming" className="hover:text-white hover:underline transition-all">
+                    Pet Grooming & Spa
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services/dental" className="hover:text-white hover:underline transition-all">
+                    Dental Hygiene
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services/vaccines" className="hover:text-white hover:underline transition-all">
+                    Vaccinations & Boosters
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services/emergency" className="hover:text-white hover:underline transition-all text-amber-200 font-bold">
+                    24/7 Urgent Care
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Newsletter & Contact */}
+            <div className="w-full md:w-3/12">
+              <h4 className="font-extrabold text-sm uppercase tracking-wider text-stone-100 mb-4 pb-1 border-b border-white/20">
+                Pet Health Tips
+              </h4>
+              <p className="text-white/80 text-xs mb-3">
+                Subscribe for monthly vet-approved nutritional guides and seasonal pet wellness tips.
+              </p>
+              {isSubscribed ? (
+                <div className="bg-white/20 p-3 rounded-xl flex items-center gap-2 text-xs font-bold text-white">
+                  <CheckCircle2 className="w-4 h-4 text-amber-300" /> You're subscribed!
+                </div>
+              ) : (
+                <form onSubmit={handleNewsletterSubmit} className="space-y-2">
+                  <input
+                    type="email"
+                    required
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="w-full bg-white text-[#27221F] px-3.5 py-2.5 rounded-xl text-xs placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  />
+                  <button
+                    type="submit"
+                    className="w-full bg-[#27221F] hover:bg-black text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    Subscribe <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              )}
+
+              <div className="mt-5 space-y-1.5 text-xs text-white/90">
+                <p className="flex items-center gap-2">
+                  <Phone className="w-3.5 h-3.5" /> (555) 349-8720
+                </p>
+                <p className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5" /> care@vetlio.com
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Social Icons Row */}
-          <div className="flex justify-center gap-4 mt-12 pt-8 border-t border-white/20 w-full max-w-5xl">
-            <a
-              href="https://facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center text-white cursor-pointer hover:bg-white hover:text-[#6E9B49] hover:border-white transition-all shadow-2xs"
-              aria-label="Facebook"
-            >
-              <FacebookIcon />
-            </a>
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center text-white cursor-pointer hover:bg-white hover:text-[#6E9B49] hover:border-white transition-all shadow-2xs"
-              aria-label="Instagram"
-            >
-              <InstagramIcon />
-            </a>
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center text-white cursor-pointer hover:bg-white hover:text-[#6E9B49] hover:border-white transition-all shadow-2xs"
-              aria-label="Twitter"
-            >
-              <TwitterIcon />
-            </a>
-            <a
-              href="https://youtube.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full border border-white/40 flex items-center justify-center text-white cursor-pointer hover:bg-white hover:text-[#6E9B49] hover:border-white transition-all shadow-2xs"
-              aria-label="YouTube"
-            >
-              <YoutubeIcon />
-            </a>
-          </div>
-
-          <div className="mt-6 text-center text-white/70 text-xs font-medium">
-            © {new Date().getFullYear()} Vetlio Pet Care. All rights reserved. Compassionate Care for Every Pet.
+          {/* Bottom Bar */}
+          <div className="w-full max-w-6xl mt-12 pt-6 border-t border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/75">
+            <p>© {new Date().getFullYear()} Vetlio Pet Care Inc. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <a href="#privacy" className="hover:text-white transition">Privacy Policy</a>
+              <span>•</span>
+              <a href="#terms" className="hover:text-white transition">Terms of Care</a>
+              <span>•</span>
+              <a href="#faq" className="hover:text-white transition">FAQs</a>
+            </div>
+            <div className="flex items-center gap-3 text-white">
+              <a href="#facebook" aria-label="Facebook" className="p-2 bg-white/10 hover:bg-white/25 rounded-full transition">
+                <FacebookIcon />
+              </a>
+              <a href="#instagram" aria-label="Instagram" className="p-2 bg-white/10 hover:bg-white/25 rounded-full transition">
+                <InstagramIcon />
+              </a>
+              <a href="#twitter" aria-label="Twitter" className="p-2 bg-white/10 hover:bg-white/25 rounded-full transition">
+                <TwitterIcon />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
