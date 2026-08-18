@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useBooking } from "../context/BookingContext";
 import {
   X,
   CheckCircle2,
@@ -111,7 +113,13 @@ const TIME_SLOTS = [
   "05:15 PM",
 ];
 
-function BookingModal({ isOpen, onClose }) {
+function BookingModal({ isOpen: propIsOpen, onClose: propOnClose }) {
+  const navigate = useNavigate();
+  const context = useBooking();
+
+  const isOpen = propIsOpen !== undefined ? propIsOpen : context?.isBookingOpen;
+  const onClose = propOnClose || context?.closeBooking;
+
   const [step, setStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const [bookingRef, setBookingRef] = useState("");
@@ -135,11 +143,21 @@ function BookingModal({ isOpen, onClose }) {
 
   const [formErrors, setFormErrors] = useState({});
 
+  // Sync preselected service from context if available
+  useEffect(() => {
+    if (context?.preselectedServiceId) {
+      setFormData((prev) => ({
+        ...prev,
+        serviceId: context.preselectedServiceId,
+      }));
+    }
+  }, [context?.preselectedServiceId, isOpen]);
+
   // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape" && isOpen) {
-        onClose();
+        onClose?.();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -200,11 +218,34 @@ function BookingModal({ isOpen, onClose }) {
     setStep((prev) => Math.max(prev - 1, 1));
   };
 
+  const selectedService =
+    SERVICES_LIST.find((s) => s.id === formData.serviceId) || SERVICES_LIST[0];
+  const selectedDoctor =
+    DOCTORS_LIST.find((d) => d.id === formData.doctorId) || DOCTORS_LIST[0];
+
   const handleConfirmBooking = (e) => {
     e.preventDefault();
     if (validateStep(4)) {
-      const generatedRef = "VET-" + Math.floor(100000 + Math.random() * 900000);
-      setBookingRef(generatedRef);
+      let createdRef = "VET-" + Math.floor(100000 + Math.random() * 900000);
+      if (context?.addAppointment) {
+        const app = context.addAppointment({
+          serviceId: formData.serviceId,
+          serviceTitle: selectedService.title,
+          doctorName: selectedDoctor.name,
+          petName: formData.petName,
+          petType: formData.petType,
+          petBreed: formData.petBreed || "Mixed / Not specified",
+          petAge: formData.petAge || "Not specified",
+          ownerName: formData.ownerName,
+          ownerEmail: formData.ownerEmail,
+          ownerPhone: formData.ownerPhone,
+          date: formData.appointmentDate,
+          time: formData.timeSlot,
+          notes: formData.notes,
+        });
+        createdRef = app.id;
+      }
+      setBookingRef(createdRef);
       setIsSuccess(true);
     }
   };
@@ -229,13 +270,8 @@ function BookingModal({ isOpen, onClose }) {
       notes: "",
     });
     setFormErrors({});
-    onClose();
+    onClose?.();
   };
-
-  const selectedService =
-    SERVICES_LIST.find((s) => s.id === formData.serviceId) || SERVICES_LIST[0];
-  const selectedDoctor =
-    DOCTORS_LIST.find((d) => d.id === formData.doctorId) || DOCTORS_LIST[0];
 
   return (
     <div
@@ -357,12 +393,23 @@ function BookingModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              <button
-                onClick={handleResetAndClose}
-                className="bg-[#6E9B49] hover:bg-[#5b853b] text-white font-bold px-8 py-3 rounded-xl transition cursor-pointer"
-              >
-                Done & Return Home
-              </button>
+              <div className="flex flex-wrap items-center justify-center gap-3 w-full">
+                <button
+                  onClick={handleResetAndClose}
+                  className="bg-white border border-stone-300 hover:bg-stone-50 text-[#27221F] font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl transition cursor-pointer"
+                >
+                  Close & Return
+                </button>
+                <button
+                  onClick={() => {
+                    handleResetAndClose();
+                    navigate("/my-appointments");
+                  }}
+                  className="bg-[#6E9B49] hover:bg-[#5b853b] text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl transition cursor-pointer shadow-sm flex items-center gap-2"
+                >
+                  View in My Bookings <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ) : (
             <>
