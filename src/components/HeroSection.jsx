@@ -1,19 +1,16 @@
 import React from "react";
-import { Calendar, ArrowRight, ShieldCheck, Heart, Sparkle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Calendar, ArrowRight } from "lucide-react";
+import { useBooking } from "../context/BookingContext";
 
 function HeroSection({ onOpenBooking }) {
-  const handleScrollToServices = (e) => {
-    e.preventDefault();
-    const srv = document.querySelector("#services");
-    if (srv) {
-      srv.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  const { openBooking } = useBooking();
+  const handleOpen = onOpenBooking || openBooking;
 
   return (
     <>
       <section
-        id="about"
+        id="hero"
         className="flex flex-col justify-center items-center bg-[#f6efe4] pt-8 md:pt-14 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden"
       >
         <div className="flex flex-col items-center text-center max-w-4xl mb-10 md:mb-16">
@@ -39,19 +36,18 @@ function HeroSection({ onOpenBooking }) {
           {/* Action CTAs */}
           <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
             <button
-              onClick={onOpenBooking}
+              onClick={() => handleOpen()}
               className="bg-[#70A352] hover:bg-[#5b8c3d] text-white px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg flex items-center gap-2"
             >
               <Calendar className="w-4 h-4" />
               Book Appointment
             </button>
-            <a
-              href="#services"
-              onClick={handleScrollToServices}
+            <Link
+              to="/services"
               className="bg-white hover:bg-stone-50 text-[#27221F] border border-stone-300 px-6 py-3.5 rounded-full font-bold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 shadow-2xs"
             >
               Our Services <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
         </div>
 
